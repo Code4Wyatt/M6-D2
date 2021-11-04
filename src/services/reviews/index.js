@@ -22,7 +22,7 @@ router
   .post(async (req, res, next) => {
     try {
       const { categories, ...rest } = req.body;
-      const newArticle = await Article.create(rest);
+      const newReview = await Review.create(rest);
 
       //assign one category
       // await ArticleCategory.create({
@@ -33,13 +33,13 @@ router
       //assign multiple
       const valuesToInsert = categories.map((category) => ({
         categoryId: category,
-        articleId: newArticle.id,
+        reviewId: newReview.id, 
       }));
       console.log({ valuesToInsert });
 
       await ArticleCategory.bulkCreate(valuesToInsert);
 
-      res.send(newArticle);
+      res.send(newReview);
     } catch (error) {
       console.log(error);
       next(error);
@@ -64,7 +64,7 @@ router.route("/:articleId/categories").post(async (req, res, next) => {
 
 router.route("/bulkCreate").post(async (req, res, next) => {
   try {
-    const data = await Article.bulkCreate(articles);
+    const data = await Review.bulkCreate(articles);
     res.send(data);
   } catch (error) {
     console.log(error);
@@ -76,8 +76,8 @@ router
   .route("/:id")
   .get(async (req, res, next) => {
     try {
-      const article = await Article.findByPk(req.params.id);
-      res.send(article);
+      const review = await Review.findByPk(req.params.id);
+      res.send(review);
     } catch (error) {
       console.log(error);
       next(error);
@@ -85,13 +85,13 @@ router
   })
   .put(async (req, res, next) => {
     try {
-      const updated = await Article.update(req.body, {
+      const updatedReview = await Review.update(req.body, {
         where: {
           id: req.params.id,
         },
         returning: true,
       });
-      res.send(updated);
+      res.send(updatedReview);
     } catch (error) {
       console.log(error);
       next(error);
@@ -99,7 +99,7 @@ router
   })
   .delete(async (req, res, next) => {
     try {
-      const rows = await Article.destroy({
+      const rows = await Review.destroy({  // use .destroy to remove from db
         where: {
           id: req.params.id,
         },
