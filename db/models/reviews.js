@@ -5,8 +5,8 @@ const { DataTypes } = s;
 const Review = sequelize.define("review", {
   id: {
     primaryKey: true,
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
   },
   text: {
     type: DataTypes.TEXT,

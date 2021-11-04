@@ -6,8 +6,8 @@ const Product = sequelize.define(
     "product",
     {
         id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
             primaryKey: true,
         },
         name: {
@@ -25,10 +25,12 @@ const Product = sequelize.define(
                 type: DataTypes.FLOAT,
                 allowNull: false,
             },
-        }
+        
+        },
+        price: {
+            type: DataTypes.FLOAT,
+            allowNull: false,
+        },
     });
-
-
-console.log("Product.js executed");
 
 export default Product;

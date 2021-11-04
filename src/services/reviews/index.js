@@ -37,7 +37,7 @@ router
       }));
       console.log({ valuesToInsert });
 
-      await ArticleCategory.bulkCreate(valuesToInsert);
+      await ReviewCategory.bulkCreate(valuesToInsert);
 
       res.send(newReview);
     } catch (error) {
