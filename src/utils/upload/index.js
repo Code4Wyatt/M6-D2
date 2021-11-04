@@ -49,7 +49,7 @@ export const uploadFile = (req, res, next) => {
     const fileName = `${req.params.id}${extension}`;
     const pathToFile = path.join(publicDirectory, fileName);
     fs.writeFileSync(pathToFile, buffer);
-    const link = `http://localhost:3001/${fileName}`; // need to change to cloudinary url?
+    const link = `http://localhost:5001/${fileName}`; // need to change to cloudinary url?
     req.file = link;
     next();
   } catch (error) {
