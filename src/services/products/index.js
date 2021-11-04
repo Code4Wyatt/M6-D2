@@ -1,106 +1,85 @@
 import express from "express";
+import models from "../../db/models/index.js";
+import Review from "../../db/models/Review.js";
+import { authors } from "../../data/authors.js";
+const { Product, Review } = models;
+const router = express.Router();
 
-import fs from "fs";
-
-import uniqid from "uniqid";
-
-import path, { dirname } from "path";
-
-import { fileURLToPath } from "url";
-
-import { parseFile, uploadFile } from "../../utils/upload/index.js";
-
-// import {
-//   checkBlogPostSchema,
-//   checkCommentSchema,
-//   checkSearchSchema,
-//   checkValidationResult,
-// } from "./validation.js";
-
-import { productsFilePath } from "../../utils/upload/index.js";
-
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = dirname(__filename);
-
-const productsRouter = express.Router();
-
-
-// post products
-productsRouter.post(
-  "/", async (req, res, next) => {
+router
+  .route("/")
+  .get(async (req, res, next) => {
     try {
-      const product = {
-        id: uniqid(),
-        ...req.body,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      const products = await Product.findAll({
+        include: { model: Product, include: Review },
+      });
+      res.send(products);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  })
+  .post(async (req, res, next) => {
+    try {
+      const data = await Product.create(req.body);
+      res.send(data);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  });
 
-      const fileAsBuffer = fs.readFileSync(productsFilePath);
+router.route("/bulkCreate").post(async (req, res, next) => {
+  try {
+    const data = await Product.bulkCreate(products);
+    res.send(data);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 
-      const fileAsString = fileAsBuffer.toString();
-
-      const fileAsJSONArray = JSON.parse(fileAsString);
-
-      fileAsJSONArray.push(product);
-
-      fs.writeFileSync(productsFilePath, JSON.stringify(fileAsJSONArray));
-
+router
+  .route("/:id")
+  .get(async (req, res, next) => {
+    try {
+      const product = await Product.findByPk(req.params.id);
       res.send(product);
     } catch (error) {
-      res.send({ message: error.message });
+      console.log(error);
+      next(error);
     }
-  }
-);
-
-// get products
-
-productsRouter.get("/", async (req, res, next) => {
-  try {
-    const fileAsBuffer = fs.readFileSync(productsFilePath);
-    const fileAsString = fileAsBuffer.toString();
-    const fileAsJSON = JSON.parse(fileAsString);
-    res.send(fileAsJSON);
-  } catch (error) {
-    res.send(500).send({ message: error.message });
-  }
-});
-
-// delete product
-
-//  update media
-productsRouter.delete("/:id", async (req, res, next) => {
-  try {
-    const fileAsBuffer = fs.readFileSync(productsFilePath);
-
-    const fileAsString = fileAsBuffer.toString();
-
-    let fileAsJSONArray = JSON.parse(fileAsString);
-
-    const productIndex = fileAsJSONArray.findIndex(
-      (product) => product.id === req.params.id
-    );
-    if (!productIndex == -1) {
-      res
-        .status(404)
-        .send({ message: `media with ${req.params.id} is not found!` });
+  })
+  .put(async (req, res, next) => {
+    try {
+      delete req.body.email;
+      delete req.body.id;
+      const newProduct = await Product.update(
+        { ...req.body },
+        {
+          where: {
+            id: req.params.id,
+          },
+          returning: true,
+        }
+      );
+      res.send(newProduct[1][0]);
+    } catch (error) {
+      console.log(error);
+      next(error);
     }
-    const previousmediaData = fileAsJSONArray[productIndex];
-    const changedmedia = {
-      ...previousmediaData,
-      ...req.body,
-      updatedAt: new Date(),
-      id: req.params.id,
-    };
-    fileAsJSONArray[mediaIndex] = changedmedia;
+  })
+  .delete(async (req, res, next) => {
+    try {
+      const productRows = await Product.destroy({
+        where: {
+          id: req.params.id,
+        },
+      });
+      res.send({ productRows });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  });
 
-    fs.writeFileSync(mediaFilePath, JSON.stringify(fileAsJSONArray));
-    res.send(changedmedia);
-  } catch (error) {
-    res.send(500).send({ message: error.message });
-  }
-});
-
-
-export default productsRouter;
+export default router;
