@@ -46,12 +46,12 @@ router
     }
   });
 
-router.route("/:articleId/categories").post(async (req, res, next) => {
+router.route("/:reviewId/categories").post(async (req, res, next) => {
   try {
     const { categories } = req.body;
     const values = categories.map((category) => ({
       categoryId: category,
-      articleId: req.params.articleId,
+      reviewId: req.params.reviewId,
     }));
     console.log({ values });
     const data = await ArticleCategory.bulkCreate(values);
@@ -64,7 +64,7 @@ router.route("/:articleId/categories").post(async (req, res, next) => {
 
 router.route("/bulkCreate").post(async (req, res, next) => {
   try {
-    const data = await Review.bulkCreate(articles);
+    const data = await Review.bulkCreate(reviews);
     res.send(data);
   } catch (error) {
     console.log(error);
