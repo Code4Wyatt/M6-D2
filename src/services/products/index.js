@@ -78,15 +78,15 @@ productsRouter.delete("/:id", async (req, res, next) => {
 
     let fileAsJSONArray = JSON.parse(fileAsString);
 
-    const mediaIndex = fileAsJSONArray.findIndex(
-      (media) => media.id === req.params.id
+    const productIndex = fileAsJSONArray.findIndex(
+      (product) => product.id === req.params.id
     );
-    if (!mediaIndex == -1) {
+    if (!productIndex == -1) {
       res
         .status(404)
         .send({ message: `media with ${req.params.id} is not found!` });
     }
-    const previousmediaData = fileAsJSONArray[mediaIndex];
+    const previousmediaData = fileAsJSONArray[productIndex];
     const changedmedia = {
       ...previousmediaData,
       ...req.body,
