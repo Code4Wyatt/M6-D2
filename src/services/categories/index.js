@@ -1,10 +1,6 @@
 import express from "express";
-import models from "../db/models/index.js"
-import multer from "multer";
-import dotenv from 'dotenv/config';
-import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
-const { Product, Review, User, Category } = models;
+import models from "../db/models/index.js";
+const { Category } = models;
 
 const categoryRouter = express.Router();
 
@@ -24,4 +20,38 @@ categoryRouter.route("/").get(async (req, res, next) => {
         console.log(error);
         next(error);
     }
-})
+});
+
+categoryRouter.route("/:id").get(async (req, res, next) => {
+    try {
+        const singleCategory = await Category.findAll({
+            where: {
+                id: `${req.params.id}`
+            }
+        });
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}).put(async (req, res, next) => {
+    const updatedCategory = await Category.update({ ...req.body }, {
+        where: {
+            id: `${req.params.id}`
+        }
+    });
+    res.send(updatedCategory)
+}).delete(async (req, res, next) => {
+    try {
+        const deteleCategory = await Category.destroy({
+            where: {
+                id: `${req.params.id}`
+            }
+        });
+        res.send({ categoryDeletion })
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
+export default categoryRouter;
